@@ -1,14 +1,19 @@
 import utils
 import tensorflow as tf
 from tensorflow import keras
+import tensorflow_addons as tfa
 from tensorflow.keras import layers
+import numpy as np
+import seaborn as sn
+import pandas as pd
+import matplotlib.pyplot as plt
 
 def swish(x):
     return x * tf.nn.sigmoid(x)
 
 print("\n\n\t### train ###\n\n")
 
-X_train, y_train = utils.get_data("voweldata/*.mat")
+X_train, y_train, keys = utils.get_data("voweldata/*.mat")
 
 model = tf.keras.Sequential()
 
@@ -22,9 +27,13 @@ model.compile(optimizer=tf.keras.optimizers.Adam(1e-4),
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-model.fit(X_train, y_train, epochs=15, verbose=1)
+model.fit(X_train, y_train, epochs=10, verbose=1)
 
-print("\n\n\t### evaluate ### \n\n")
+pred = list(map(lambda el: np.argmax(el), model.predict(X_train)))
+actual = list(map(lambda el: np.argmax(el), y_train))
 
-X_test, y_test = utils.get_data("testdata/*.mat")
-model.evaluate(X_test, y_test, verbose=2)
+cm = tf.math.confusion_matrix(pred, actual, num_classes=len(keys))
+df_cm = pd.DataFrame(cm.numpy(), index=keys, columns=keys)
+plt.figure(figsize=(10,7))
+sn.heatmap(df_cm, annot=True)
+plt.show()

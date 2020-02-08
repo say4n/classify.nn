@@ -56,4 +56,4 @@ def get_data(path, *, debug=False):
             X_train.append(sample.reshape(2500 * len(indices),))
             y_train.append(label)
 
-    return np.array(X_train), np.array(y_train)
+    return np.array(X_train), np.array(y_train), data.keys()
