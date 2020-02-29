@@ -8,6 +8,8 @@ import seaborn as sn
 import pandas as pd
 import matplotlib.pyplot as plt
 
+SEED = 42
+
 def swish(x):
     return x * tf.nn.sigmoid(x)
 
@@ -17,17 +19,27 @@ X_train, y_train, keys = utils.get_data("voweldata/*.mat")
 
 model = tf.keras.Sequential()
 
-model.add(layers.Dense(8192, activation=swish))
-model.add(layers.Dense(1024, activation=swish))
-model.add(layers.Dense(256, activation=swish))
-model.add(layers.Dense(64, activation=swish))
-model.add(layers.Dense(7, activation='softmax'))
+model.add(layers.Dense(8192,
+                       activation=swish,
+                       kernel_initializer=keras.initializers.RandomNormal(seed=SEED)))
+model.add(layers.Dense(1024,
+                       activation=swish,
+                       kernel_initializer=keras.initializers.RandomNormal(seed=SEED)))
+model.add(layers.Dense(256,
+                       activation=swish,
+                       kernel_initializer=keras.initializers.RandomNormal(seed=SEED)))
+model.add(layers.Dense(64,
+                       activation=swish,
+                       kernel_initializer=keras.initializers.RandomNormal(seed=SEED)))
+model.add(layers.Dense(7,
+                       activation='softmax',
+                       kernel_initializer=keras.initializers.RandomNormal(seed=SEED)))
 
-model.compile(optimizer=tf.keras.optimizers.Adam(1e-4),
+model.compile(optimizer=tf.keras.optimizers.Adam(1e-5),
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-model.fit(X_train, y_train, epochs=10, verbose=1)
+model.fit(X_train, y_train, epochs=5, verbose=1)
 
 pred = list(map(lambda el: np.argmax(el), model.predict(X_train)))
 actual = list(map(lambda el: np.argmax(el), y_train))
